@@ -7,11 +7,14 @@
 <img class="bookcover" src="{% static 'images/dfp.jpg' %}">
 {% if user.is_authenticated %}
     <p>Hi {{ user.email }}!</p>
-    <a class="btn btn-small btn-success" href="{% url 'account_change_password' %}">Change password</a>
-    <a class="btn btn-small btn-primary" href="{% url 'account_logout' %}">Logout</a>
+    <a class="btn btn-sm btn-success" href="{% url 'account_change_password' %}">Change password</a>
+    <a class="btn btn-sm btn-primary" href="{% url 'account_logout' %}">Logout</a>
 {% else %}
     <p>You are not logged in</p>
-    <a class="btn btn-small btn-primary" href="{% url 'account_login' %}">Log In</a>
-    <a class="btn btn-small btn-primary" href="{% url 'account_signup' %}">Sign up</a>
+    <a class="btn btn-sm btn-primary" href="{% url 'account_login' %}">Log In</a>
+    <a class="btn btn-sm btn-primary" href="{% url 'account_signup' %}">Sign up</a>
 {% endif %}
+<div style="margin-top:1rem;">
+    <a class="btn btn btn-primary" href="{% url 'books_list' %}">Books</a>
+</div>
 {% endblock content %}

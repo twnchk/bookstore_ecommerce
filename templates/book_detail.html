@@ -1,0 +1,9 @@
+{% extends '_base.html' %}
+{% load static %}
+{% block title %} Book - {{ book.title }} {% endblock title %}
+
+{% block content %}
+    <h1>{{ book.title }}</h1>
+    <p>{{ book.author }}</p>
+    <a href="#" class="btn btn-primary">{{ book.price }}$ | Add to cart</a>
+{% endblock content %}
