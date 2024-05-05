@@ -1,7 +1,8 @@
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import resolve
 
-from .models import Book
+from .models import Book, Review
 from .views import BookListView, BookDetailView
 
 
@@ -12,7 +13,22 @@ class BookTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.book = Book.objects.create(title=cls.title, author=cls.author, price=cls.price)
+        cls.user = get_user_model().objects.create_user(
+            username='tester',
+            email='tester@domain.com',
+            password='testing123456'
+        )
+
+        cls.book = Book.objects.create(
+            title=cls.title,
+            author=cls.author,
+            price=cls.price)
+
+        cls.review = Review.objects.create(
+            book=cls.book,
+            author=cls.user,
+            review='Great product test review'
+        )
 
     def test_book_data(self):
         self.assertEqual(f"{self.book.title}", self.title)
@@ -35,6 +51,7 @@ class BookTests(TestCase):
         self.assertEqual(no_response.status_code, 404)
         self.assertTemplateUsed(response, 'book_detail.html')
         self.assertContains(response, 'Foo1')
+        self.assertContains(response, 'Great product test review')
 
         view = resolve(self.book.get_absolute_url())
         self.assertEqual(view.func.__name__, BookDetailView.as_view().__name__)
