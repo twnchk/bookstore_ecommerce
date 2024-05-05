@@ -4,16 +4,18 @@
 
 {% block content %}
 <h1>Books list</h1>
-{% for book in book_list %}
-    <a href="{{ book.get_absolute_url }}">
-        <div class="card" style="max-width: 18rem;">
-          <img class="card-img-top" src="..." alt="Book img">
-          <div class="card-body">
-            <h5 class="card-title">{{ book.title }}</h5>
-            <p class="card-text">{{ book.author }}</p>
-            <a href="#" class="btn btn-primary">{{ book.price }}$ | Add to cart</a>
-          </div>
+<div class="container mt-5">
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for book in book_list %}
+        <div class="col">
+            <a href="{{ book.get_absolute_url }}" class="card h-100 text-decoration-none text-dark">
+                <img src="https://via.placeholder.com/200" class="card-img-top" alt="Product">
+                    <h5 class="card-title">{{ book.title }}</h5>
+                    <p class="card-text text-muted">{{ book.author }}</p>
+                    <a href="#" class="btn btn-success">{{ book.price }}$ | Add to cart</a>
+            </a>
         </div>
-    </a>
-{% endfor %}
+        {% endfor %}
+    </div>
+</div>
 {% endblock content %}
