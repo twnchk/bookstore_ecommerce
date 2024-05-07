@@ -10,9 +10,9 @@
         <div class="col">
             <a href="{{ book.get_absolute_url }}" class="card h-100 text-decoration-none text-dark">
                 <img src="https://via.placeholder.com/200" class="card-img-top" alt="Product">
-                    <h5 class="card-title">{{ book.title }}</h5>
-                    <p class="card-text text-muted">{{ book.author }}</p>
-                    <a href="#" class="btn btn-success">{{ book.price }}$ | Add to cart</a>
+                <h5 class="card-title">{{ book.title }}</h5>
+                <p class="card-text text-muted">{{ book.author }}</p>
+                <a href="#" class="btn btn-success">{{ book.price }}$ | Add to cart</a>
             </a>
         </div>
         {% endfor %}

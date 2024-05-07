@@ -5,3 +5,7 @@ db.sqlite3
 
 # Ignore PyCharm settings
 .idea/
+
+# coveragepy
+htmlcov/
+.coverage

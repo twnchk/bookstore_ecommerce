@@ -1,4 +1,4 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
 from django.test import TestCase
 from django.urls import resolve
 
@@ -10,13 +10,15 @@ class BookTests(TestCase):
     title = 'Foo1'
     author = 'John Don'
     price = 25.00
+    user_email = 'tester@domain.com'
+    user_password = 'testing123456'
 
     @classmethod
     def setUpTestData(cls):
         cls.user = get_user_model().objects.create_user(
             username='tester',
-            email='tester@domain.com',
-            password='testing123456'
+            email=cls.user_email,
+            password=cls.user_password
         )
 
         cls.book = Book.objects.create(
@@ -55,3 +57,32 @@ class BookTests(TestCase):
 
         view = resolve(self.book.get_absolute_url())
         self.assertEqual(view.func.__name__, BookDetailView.as_view().__name__)
+
+    def test_book_add_review(self):
+        login = self.client.login(email=self.user_email, password=self.user_password)
+        self.assertTrue(login)
+
+        post_request = self.client.post(self.book.get_absolute_url(),
+                                        data={"book": self.book, "author": self.user, "review": "Another review!!!"})
+        self.assertRedirects(post_request, self.book.get_absolute_url(), 302)
+
+        response = self.client.get(self.book.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'book_detail.html')
+        self.assertContains(response, 'Foo1')
+        self.assertContains(response, 'Another review!!!')
+
+    def test_book_add_review_user_not_logged(self):
+        login = self.client.login(email='wrongEmail@gmail.com', password=self.user_password)
+        self.assertFalse(login)
+
+        post_request = self.client.post(self.book.get_absolute_url(), data={"book": self.book,
+                                                                            "author": self.user,
+                                                                            "review": "This will not be added"})
+        self.assertEqual(post_request.status_code, 403)
+
+        response = self.client.get(self.book.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'book_detail.html')
+        self.assertContains(response, 'Foo1')
+        self.assertNotContains(response, 'This will not be added')
