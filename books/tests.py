@@ -38,6 +38,9 @@ class BookTests(TestCase):
         self.assertEqual(self.book.price, self.price)
 
     def test_book_listview(self):
+        login = self.client.login(email=self.user_email, password=self.user_password)
+        self.assertTrue(login)
+
         response = self.client.get('/books/')
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'books_list.html')
@@ -47,6 +50,9 @@ class BookTests(TestCase):
         self.assertEqual(view.func.__name__, BookListView.as_view().__name__)
 
     def test_book_detailview(self):
+        login = self.client.login(email=self.user_email, password=self.user_password)
+        self.assertTrue(login)
+
         response = self.client.get(self.book.get_absolute_url())
         no_response = self.client.get('/books/12345/')
         self.assertEqual(response.status_code, 200)
@@ -57,6 +63,17 @@ class BookTests(TestCase):
 
         view = resolve(self.book.get_absolute_url())
         self.assertEqual(view.func.__name__, BookDetailView.as_view().__name__)
+
+    def test_book_listview_user_not_logged(self):
+        response = self.client.get('/books/')
+        self.assertEqual(response.status_code, 302)
+        self.assertTemplateNotUsed(response, 'books_list.html')
+
+    def test_book_detailview_user_not_logged(self):
+        response = self.client.get(self.book.get_absolute_url())
+        no_response = self.client.get('/books/12345/')
+        self.assertEqual(response.status_code, 302)
+        self.assertTemplateNotUsed(response, 'books_detail.html')
 
     def test_book_add_review(self):
         login = self.client.login(email=self.user_email, password=self.user_password)
@@ -79,10 +96,8 @@ class BookTests(TestCase):
         post_request = self.client.post(self.book.get_absolute_url(), data={"book": self.book,
                                                                             "author": self.user,
                                                                             "review": "This will not be added"})
-        self.assertEqual(post_request.status_code, 403)
+        self.assertEqual(post_request.status_code, 302)
 
         response = self.client.get(self.book.get_absolute_url())
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'book_detail.html')
-        self.assertContains(response, 'Foo1')
-        self.assertNotContains(response, 'This will not be added')
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, f'/accounts/login/?next={self.book.get_absolute_url()}', 302)
