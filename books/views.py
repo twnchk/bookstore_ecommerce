@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseForbidden
 from django.urls import reverse
 from django.views import View
@@ -8,7 +9,7 @@ from .forms import CreateReviewForm
 from .models import Book
 
 
-class BookListView(ListView):
+class BookListView(LoginRequiredMixin, ListView):
     model = Book
     template_name = 'books_list.html'
 
@@ -49,7 +50,7 @@ class BookReviewFormView(SingleObjectMixin, FormView):
         return super(BookReviewFormView, self).form_valid(form)
 
 
-class BookView(View):
+class BookView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         view = BookDetailView.as_view()
         return view(request, *args, **kwargs)
