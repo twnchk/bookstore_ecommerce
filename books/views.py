@@ -1,4 +1,4 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.http import HttpResponseForbidden
 from django.urls import reverse
 from django.views import View
@@ -14,9 +14,10 @@ class BookListView(LoginRequiredMixin, ListView):
     template_name = 'books_list.html'
 
 
-class BookDetailView(DetailView):
+class BookDetailView(PermissionRequiredMixin, DetailView):
     model = Book
     template_name = 'book_detail.html'
+    permission_required = 'books.verified_user'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
