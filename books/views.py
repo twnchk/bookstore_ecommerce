@@ -1,4 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.db.models import Q
 from django.http import HttpResponseForbidden
 from django.urls import reverse
 from django.views import View
@@ -38,9 +39,6 @@ class BookReviewFormView(SingleObjectMixin, FormView):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if not request.user.is_authenticated:
-            # TODO: Create template forbidden.html
-            return HttpResponseForbidden()
         return super().post(request, *args, **kwargs)
 
     def get_success_url(self):
@@ -59,3 +57,12 @@ class BookView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         view = BookReviewFormView.as_view()
         return view(request, *args, **kwargs)
+
+
+class SearchResultsListView(ListView):
+    model = Book
+    template_name = 'search_results.html'
+
+    def get_queryset(self):
+        query=self.request.GET.get("q")
+        return Book.objects.filter(Q(title__icontains=query) | Q(author__icontains=query))

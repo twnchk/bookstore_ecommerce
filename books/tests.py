@@ -107,3 +107,10 @@ class BookTests(TestCase):
         response = self.client.get(self.book.get_absolute_url())
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, f'/accounts/login/?next={self.book.get_absolute_url()}', 302)
+
+    def test_book_search_query(self):
+        response = self.client.get("/books/search/?q=%s" % self.title)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'search_results.html')
+        self.assertContains(response, self.title)
